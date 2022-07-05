@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <pthread.h>
@@ -92,6 +93,8 @@ void *clnt_receiver(void *arg)
         fgets(message, BUF_SIZE, read_fp);
         printf("%s", message);
     }
+    
+    return NULL;
 }
 
 void *clnt_sender(void *arg)
@@ -102,29 +105,31 @@ void *clnt_sender(void *arg)
     printf("Enter name: ");
     fgets(message, BUF_SIZE, stdin);
     fputs(message, write_fp);
+    fflush(write_fp);
 
     while(1)
     {
+        printf("Enter message(BYE to exit):\n");
+
         fgets(message, BUF_SIZE, stdin);
         fputs(message, write_fp);
         fflush(write_fp);
         if(is_saying_bye(message))
         {
+            err = pthread_cancel(read_tid);
+            if(err != 0)
+            {
+                error_handler("pthread_cancel()");
+            }
+
             fclose(read_fp);
             fclose(write_fp);
 
             break;
-        } else
-        {
-            printf("Enter message(BYE to exit):\n");
         }
     }
 
-    err = pthread_cancel(read_tid);
-    if(err != 0)
-    {
-        error_handler("pthread_cancel()");
-    }
+    
 
     printf("Connection shut down\n");
 
@@ -141,13 +146,13 @@ void communicate_with_server()
 {
     int err;
 
-    err = pthread_create(&read_tid, NULL, clnt_sender, NULL);
+    err = pthread_create(&write_tid, NULL, clnt_sender, NULL);
     if(err != 0)
     {
         error_handler("pthread_create()");
     }
 
-    err = pthread_create(&write_tid, NULL, clnt_receiver, NULL);
+    err = pthread_create(&read_tid, NULL, clnt_receiver, NULL);
     if(err != 0)
     {
         error_handler("pthread_create()");
