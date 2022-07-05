@@ -129,8 +129,6 @@ void *clnt_sender(void *arg)
         }
     }
 
-    
-
     printf("Connection shut down\n");
 
     err = pthread_join(read_tid, NULL);

@@ -66,10 +66,6 @@ int is_saying_bye(char *message);
  */
 void *clnt_handler(void *clnt_sock);
 
-
-
-
-
 ////////////////////函数定义////////////////////
 void error_handler(char *error_msg)
 {
@@ -118,7 +114,7 @@ int add_clnt_sock(int clnt_sock)
             clnts[i].write_fp = fdopen(dup(clnt_sock), "w");
             
             pthread_mutex_unlock(&mutex_lock);
-            
+
             return i;
         }
     }
