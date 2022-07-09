@@ -90,8 +90,10 @@ void *clnt_receiver(void *arg)
 
     while(1)
     {
-        fgets(message, BUF_SIZE, read_fp);
-        printf("%s", message);
+        if(fgets(message, BUF_SIZE, read_fp) != NULL)
+        {
+            printf("%s", message);
+        }
     }
     
     return NULL;
